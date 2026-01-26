@@ -1,0 +1,8 @@
+
+{
+  "name": "Roboss Loyalty App",
+  "description": "A sleek, mobile-first loyalty application for Roboss Automatic Car Wash, featuring stamp collection, premium wash packages, and scan-to-wash functionality.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
