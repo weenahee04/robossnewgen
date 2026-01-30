@@ -30,13 +30,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await adminApi.login(email, password);
-    setUser(response.user);
+    try {
+      const response = await adminApi.login(email, password);
+      setUser(response.user);
+    } catch (error: any) {
+      const errorMessage = error?.message || '';
+      if (
+        errorMessage.includes('API_URL not configured') ||
+        errorMessage.includes('Empty response') ||
+        errorMessage.includes('Network error') ||
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('ERR_CONNECTION_REFUSED')
+      ) {
+        console.log('Using demo mode - no backend available');
+        // Fallback to demo user
+        const demoUser: User = {
+          id: 'admin-demo',
+          email: 'admin@roboss.com',
+          name: 'Admin Demo',
+        };
+        setUser(demoUser);
+        localStorage.setItem('adminToken', 'demo-token');
+      } else {
+        throw error;
+      }
+    }
   };
 
   const demoLogin = async () => {
-    const response = await adminApi.demoLogin();
-    setUser(response.user);
+    try {
+      const response = await adminApi.demoLogin();
+      setUser(response.user);
+    } catch (error: any) {
+      const errorMessage = error?.message || '';
+      if (
+        errorMessage.includes('API_URL not configured') ||
+        errorMessage.includes('Empty response') ||
+        errorMessage.includes('Network error') ||
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('ERR_CONNECTION_REFUSED')
+      ) {
+        console.log('Using demo mode - no backend available');
+        // Fallback to demo user
+        const demoUser: User = {
+          id: 'admin-demo',
+          email: 'admin@roboss.com',
+          name: 'Admin Demo',
+        };
+        setUser(demoUser);
+        localStorage.setItem('adminToken', 'demo-token');
+      } else {
+        throw error;
+      }
+    }
   };
 
   const logout = () => {

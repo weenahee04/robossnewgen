@@ -10,8 +10,8 @@
 
 body {
   font-family: 'Kanit', sans-serif;
-  background: #000;
-  color: #fff;
+  background: #F8F9FA;
+  color: #1A1A1A;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -20,14 +20,43 @@ body {
   min-height: 100vh;
 }
 
+/* Red Theme */
+.bg-roboss-red {
+  background-color: #DC2626;
+}
+
+.text-roboss-red {
+  color: #DC2626;
+}
+
+.border-roboss-red {
+  border-color: #DC2626;
+}
+
 .gradient-red {
   background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.gradient-red-light {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
 }
 
 .gradient-premium-gold {
   background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
 }
 
+/* Card Styles */
+.card-white {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-white:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -35,4 +64,23 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Custom Scrollbar for White Theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }

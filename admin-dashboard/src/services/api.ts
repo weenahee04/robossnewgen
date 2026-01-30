@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3001/api';
+// Use environment variable or fallback to empty string for demo mode
+const API_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 class AdminApiService {
   private token: string | null = null;
@@ -18,9 +19,14 @@ class AdminApiService {
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const headers: HeadersInit = {
+    // If no API URL is set, throw error to indicate demo mode
+    if (!API_URL) {
+      throw new Error('API_URL not configured. Please use demo mode or configure VITE_API_BASE_URL');
+    }
+
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> || {}),
     };
 
     if (this.token) {
@@ -32,10 +38,20 @@ class AdminApiService {
       headers,
     });
 
-    const data = await response.json();
+    // Handle empty response body for non-OK responses
+    let data: any;
+    try {
+      data = await response.json();
+    } catch (e) {
+      if (!response.ok) {
+        throw new Error(`Empty response from server (Status: ${response.status})`);
+      }
+      // If it's an OK response but no JSON, it might be fine (e.g., 204 No Content)
+      data = {};
+    }
 
     if (!response.ok) {
-      throw new Error(data.error || 'An error occurred');
+      throw new Error(data.error || `An error occurred (Status: ${response.status})`);
     }
 
     return data;
@@ -86,11 +102,12 @@ class AdminApiService {
   }
 
   // Stock APIs
-  async getStockItems(category?: string, lowStock?: boolean, search?: string) {
+  async getStockItems(category?: string, lowStock?: boolean, search?: string, branchId?: string) {
     const params = new URLSearchParams();
     if (category) params.append('category', category);
     if (lowStock) params.append('lowStock', 'true');
     if (search) params.append('search', search);
+    if (branchId) params.append('branchId', branchId);
     const query = params.toString() ? `?${params.toString()}` : '';
     return this.request<any>(`/stock${query}`);
   }
@@ -155,6 +172,121 @@ class AdminApiService {
 
   async getStockSummary() {
     return this.request<any>('/stock/summary/stats');
+  }
+
+  // Branch Management APIs
+  async getBranches() {
+    return this.request<any>('/admin/branches');
+  }
+
+  async getBranch(id: string) {
+    return this.request<any>(`/admin/branches/${id}`);
+  }
+
+  async createBranch(data: any) {
+    return this.request<any>('/admin/branches', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateBranch(id: string, data: any) {
+    return this.request<any>(`/admin/branches/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteBranch(id: string) {
+    return this.request<any>(`/admin/branches/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getBranchStats(id: string) {
+    return this.request<any>(`/admin/branches/${id}/stats`);
+  }
+
+  // Packages APIs
+  async getPackages() {
+    return this.request<any[]>('/packages');
+  }
+
+  async getPackage(id: string) {
+    return this.request<any>(`/packages/${id}`);
+  }
+
+  async createPackage(data: any) {
+    return this.request<any>('/packages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updatePackage(id: string, data: any) {
+    return this.request<any>(`/packages/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deletePackage(id: string) {
+    return this.request<any>(`/packages/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Rewards APIs
+  async getRewards() {
+    return this.request<any[]>('/rewards');
+  }
+
+  async getReward(id: string) {
+    return this.request<any>(`/rewards/${id}`);
+  }
+
+  async createReward(data: any) {
+    return this.request<any>('/rewards', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateReward(id: string, data: any) {
+    return this.request<any>(`/rewards/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteReward(id: string) {
+    return this.request<any>(`/rewards/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async redeemReward(rewardId: string) {
+    return this.request<any>('/rewards/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ rewardId }),
+    });
+  }
+
+  // Transactions APIs
+  async getTransactions(filters?: any) {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.branchId) params.append('branchId', filters.branchId);
+    if (filters?.startDate) params.append('startDate', filters.startDate);
+    if (filters?.endDate) params.append('endDate', filters.endDate);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.offset) params.append('offset', filters.offset.toString());
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.request<any[]>(`/transactions${query}`);
+  }
+
+  async getTransaction(id: string) {
+    return this.request<any>(`/transactions/${id}`);
   }
 
   logout() {
