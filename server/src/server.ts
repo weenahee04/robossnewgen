@@ -14,13 +14,20 @@ import notificationRoutes from './routes/notifications-simple.js';
 import qrRoutes from './routes/qr-simple.js';
 import adminRoutes from './routes/admin-simple.js';
 import stockRoutes from './routes/stock-simple.js';
+import branchesAdminRoutes from './routes/branches-admin.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// CORS configuration - allow all origins for production
+// In production, you can restrict to specific domains:
+// app.use(cors({ origin: ['https://robossnewgen.vercel.app', 'https://admin-dashboard-xi-five-61.vercel.app'] }));
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true
+}));
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -42,6 +49,7 @@ app.use('/api/rewards', rewardRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/branches', branchesAdminRoutes);
 app.use('/api/stock', stockRoutes);
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

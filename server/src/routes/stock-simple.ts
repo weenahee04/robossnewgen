@@ -9,9 +9,14 @@ const router = Router();
 // Get all stock items
 router.get('/', authenticateToken, (req: AuthRequest, res) => {
   try {
-    const { category, lowStock, search } = req.query;
+    const { category, lowStock, search, branchId } = req.query;
     
     let items = findStockItems(() => true);
+
+    // Filter by branch
+    if (branchId) {
+      items = items.filter(item => item.branchId === branchId || !item.branchId); // Include items without branchId (shared stock)
+    }
 
     // Filter by category
     if (category) {
@@ -94,7 +99,7 @@ router.post('/', authenticateToken, (req: AuthRequest, res) => {
       previousQuantity: 0,
       newQuantity: quantity,
       reason: 'สร้างรายการสินค้าใหม่',
-      userId: req.user!.id,
+      userId: req.userId!,
       createdAt: new Date().toISOString()
     };
 
@@ -198,7 +203,7 @@ router.post('/:id/stock-in', authenticateToken, (req: AuthRequest, res) => {
       newQuantity,
       reason: reason || 'รับสินค้าเข้าคลัง',
       branchId,
-      userId: req.user!.id,
+      userId: req.userId!,
       createdAt: new Date().toISOString()
     };
 
@@ -255,7 +260,7 @@ router.post('/:id/stock-out', authenticateToken, (req: AuthRequest, res) => {
       newQuantity,
       reason: reason || 'เบิกสินค้าออก',
       branchId,
-      userId: req.user!.id,
+      userId: req.userId!,
       createdAt: new Date().toISOString()
     };
 
@@ -307,7 +312,7 @@ router.post('/:id/adjust', authenticateToken, (req: AuthRequest, res) => {
       previousQuantity,
       newQuantity,
       reason: reason || 'ปรับปรุงสต็อก',
-      userId: req.user!.id,
+      userId: req.userId!,
       createdAt: new Date().toISOString()
     };
 

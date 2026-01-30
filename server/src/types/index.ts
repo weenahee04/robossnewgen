@@ -114,6 +114,7 @@ export interface StockItem {
   unitPrice: number;
   supplier?: string;
   location?: string;
+  branchId?: string; // แยกสต็อกตามสาขา
   lastRestockDate?: string;
   createdAt: string;
   updatedAt: string;
